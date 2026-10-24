@@ -1,0 +1,39 @@
+# Node modules (reinstalled inside container)
+node_modules
+
+# Build output (we rebuild inside Docker)
+dist
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# Docker files (optional to ignore themselves)
+Dockerfile
+.dockerignore
+
+# Environment files (important for security)
+.env
+.env.*
+desilynks-chat-firebase.json
+
+# Tests (not needed in production image)
+test
+coverage
+
+# IDE/editor files
+.vscode
+.idea
+
+# Misc
+*.md

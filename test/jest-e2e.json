@@ -1,0 +1,18 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@libs/common$": "<rootDir>/../libs/common/index.ts",
+    "^@libs/common/(.*)$": "<rootDir>/../libs/common/src/$1",
+    "^@generated/prisma(|/.*)$": "<rootDir>/../generated/prisma/$1",
+    "^@app/api/(.*)$": "<rootDir>/../apps/api/src/$1",
+    "^jwks-rsa$": "<rootDir>/mocks/jwks-rsa.ts",
+    "^@nestjs/bullmq$": "<rootDir>/mocks/nestjs-bullmq.ts",
+    "^ioredis$": "<rootDir>/mocks/ioredis.ts"
+  }
+}

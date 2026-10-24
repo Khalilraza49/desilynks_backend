@@ -1,0 +1,31 @@
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build:worker
+
+# Production stage
+FROM node:22-alpine
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY package*.json ./
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+
+RUN npm install --omit=dev --ignore-scripts
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/generated ./generated
+
+CMD ["npm", "run", "start:worker:prod"]

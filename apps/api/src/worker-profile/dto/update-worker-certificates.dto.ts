@@ -1,0 +1,25 @@
+import { Transform } from 'class-transformer';
+import { IsArray, IsOptional, IsUUID } from 'class-validator';
+
+export class UpdateWorkerCertificatesDto {
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : value;
+      } catch {
+        return value;
+      }
+    }
+    return value;
+  })
+  @IsArray()
+  @IsUUID('4', {
+    each: true,
+    message: 'Each certificate ID must be a valid UUID',
+  })
+  certificatesToRemove?: string[];
+}

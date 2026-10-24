@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification - DesiLynks</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f7f8ff;
+      color: #3b465b;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    table {
+      border-spacing: 0;
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #f7f8ff;
+    }
+    .email-container {
+      padding: 48px 24px 64px;
+    }
+    .main {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border: 1px solid #e8ecf5;
+      border-collapse: separate;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(40, 59, 105, 0.06);
+    }
+    .header {
+      padding: 32px 40px 28px;
+      text-align: center;
+      background-color: #ffffff;
+      border-top: 4px solid #2563eb;
+      border-bottom: 1px solid #edf0f7;
+      border-radius: 23px 23px 0 0;
+    }
+    .header-logo {
+      margin: 0;
+      color: #2563eb;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.6px;
+    }
+    .content {
+      padding: 36px 40px 40px;
+      color: #3b465b;
+      font-size: 16px;
+      line-height: 1.75;
+      text-align: left;
+      overflow-wrap: break-word;
+    }
+    .content p {
+      margin: 0 0 18px;
+    }
+    .content p:first-child {
+      margin-bottom: 20px;
+      color: #273449;
+      font-size: 18px;
+    }
+    .content p:last-child {
+      margin-bottom: 0;
+    }
+    .content strong {
+      color: #273449;
+      font-weight: 600;
+    }
+    .footer {
+      padding: 24px 40px;
+      background-color: #f8faff;
+      border-top: 1px solid #edf0f7;
+      border-radius: 0 0 23px 23px;
+      text-align: center;
+    }
+    .footer p {
+      margin: 0 0 8px;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+    .footer p:last-child {
+      margin-bottom: 0;
+      color: #738095;
+    }
+
+    .otp-container {
+      margin: 28px 0 32px;
+      text-align: center;
+    }
+    .otp-code {
+      display: inline-block;
+      padding: 20px 28px 20px 36px;
+      background-color: #eff6ff;
+      border: 1px solid #dbe7ff;
+      border-radius: 18px;
+      color: #2563eb;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: 8px;
+      white-space: nowrap;
+    }
+  </style>
+  <style data-css-inline="keep">
+    @media screen and (max-width: 600px) {
+      .email-container {
+        padding: 24px 12px 36px !important;
+      }
+      .main {
+        border-radius: 20px !important;
+      }
+      .header {
+        padding: 28px 24px 24px !important;
+        border-radius: 19px 19px 0 0 !important;
+      }
+      .header-logo {
+        font-size: 26px !important;
+      }
+      .content {
+        padding: 28px 24px 32px !important;
+        font-size: 15px !important;
+      }
+      .footer {
+        padding: 22px 24px !important;
+        border-radius: 0 0 19px 19px !important;
+      }
+      .otp-code {
+        padding: 18px 20px 18px 26px !important;
+        font-size: 28px !important;
+        letter-spacing: 6px !important;
+      }
+      .features-list {
+        padding: 20px 18px 20px 36px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #f7f8ff;">
+      <tr>
+        <td class="email-container" align="center">
+          <table class="main" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+              <td class="header">
+                <h1 class="header-logo">DesiLynks</h1>
+              </td>
+            </tr>
+            <tr>
+              <td class="content">
+                <p>Hi <strong>{{fullName}}</strong>,</p>
+                <p>Thank you for signing up for DesiLynks. To complete your registration, please verify your email address using the One-Time Password (OTP) below.</p>
+                
+                <div class="otp-container">
+                  <span class="otp-code">{{otp}}</span>
+                </div>
+                
+                <p>This OTP is valid for <strong>15 minutes</strong>. For your security, please do not share this code with anyone.</p>
+                <p>If you did not create an account with us, please safely ignore this email.</p>
+              </td>
+            </tr>
+            <tr>
+              <td class="footer">
+                <p>This is an automated email sent to you by DesiLynks.</p>
+                <p>&copy; 2026 DesiLynks. All rights reserved.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

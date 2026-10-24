@@ -1,0 +1,1552 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// enums
+
+enum Gender {
+  MALE
+  FEMALE
+  PREFER_NOT_TO_SAY
+}
+
+enum PropertyType {
+  ROOM
+  APARTMENT
+  HOUSE
+  STUDIO
+}
+
+enum ContactPreference {
+  CHAT
+  CALL
+  WHATSAPP
+}
+
+enum PropertyStatus {
+  DRAFT
+  PUBLISHED
+  RENTED
+  ARCHIVED
+  INACTIVE
+}
+
+enum SalaryPeriod {
+  PER_HOUR
+  PER_DAY
+  PER_WEEK
+  PER_MONTH
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  FREELANCE
+  INTERNSHIP
+}
+
+enum Experience {
+  NO_EXPERIENCE
+  ONE_PLUS_YEARS
+  TWO_PLUS_YEARS
+  THREE_PLUS_YEARS
+  FIVE_PLUS_YEARS
+}
+
+enum Language {
+  ENGLISH
+  SPANISH
+  URDU
+  HINDI
+  ARABIC
+}
+
+enum WorkMode {
+  REMOTE
+  ONSITE
+  HYBRID
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+  ARCHIVED
+}
+
+enum JobApplicationStatus {
+  PENDING
+  REVIEWING
+  SHORTLISTED
+  INTERVIEW
+  OFFERED
+  REJECTED
+  WITHDRAWN
+}
+
+enum WorkerService {
+  ELECTRICIAN
+  PLUMBER
+  PAINTER
+  CLEANER
+  DRIVER
+  CHEF
+  CONSTRUCTION_WORKER
+  GARDENER
+  COURIER
+  HANDYMAN
+  BARBER
+  PET_SITTER
+  IT_SUPPORT
+  PHOTOGRAPHER
+  OTHER
+}
+
+enum WorkRequestType {
+  ONETIME
+  RECURRING
+}
+
+enum WorkRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum BudgetType {
+  FIXED
+  PERHOUR
+  NEGOTIABLE
+}
+
+enum NeedAWorkerApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ProductAdCategory {
+  PHONES
+  CARS
+  ELECTRONICS
+  FURNITURE
+  CLOTHES
+  BOOKS
+  KIDS
+  OTHER
+}
+
+enum ProductCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  FOR_PARTS
+}
+
+enum ProductAdStatus {
+  ACTIVE
+  PENDING
+  INACTIVE
+}
+
+enum ProductAdOfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum BusinessListingStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+enum CommunityGroupPrivacy {
+  PUBLIC
+  PRIVATE
+}
+
+enum CommunityGroupStatus {
+  ACTIVE
+  ARCHIVED
+  SUSPENDED
+}
+
+enum CommunityGroupCategory {
+  FUN
+  SPORT
+  EDUCATIONAL
+  OTHER
+}
+
+enum CommunityGroupMemberRole {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+enum CommunityGroupMemberStatus {
+  ACTIVE
+  PENDING
+  REJECTED
+  BANNED
+}
+
+enum CommunityPostType {
+  TEXT
+  PHOTO
+  VIDEO
+  POLL
+}
+
+enum CommunityPostVisibility {
+  PUBLIC
+  GROUP
+  PRIVATE
+}
+
+enum CommunityPostStatus {
+  ACTIVE
+  HIDDEN
+  REMOVED
+}
+
+enum CommunityEventType {
+  CELEBRATION
+  SPORTS
+  FOOD_AND_DINING
+  EDUCATION
+  RELIGIOUS
+  BUSINESS
+  MUSIC
+  GAMING
+}
+
+enum CommunityEventVisibility {
+  PUBLIC
+  GROUP
+  INVITE_ONLY
+}
+
+enum NotificationType {
+  POST_LIKED
+  POST_COMMENTED
+  POST_SHARED
+  COMMENT_REPLIED
+
+  WORK_REQUEST_RECEIVED
+  WORK_REQUEST_ACCEPTED
+  WORK_REQUEST_REJECTED
+  WORK_REQUEST_WITHDRAWN
+
+  NEED_A_WORKER_POSTED
+  WORKER_APPLICATION_RECEIVED
+  WORKER_APPLICATION_ACCEPTED
+  WORKER_APPLICATION_REJECTED
+  WORKER_APPLICATION_WITHDRAWN
+
+  JOB_APPLICATION_RECEIVED
+  JOB_APPLICATION_STATUS_UPDATED
+  JOB_APPLICATION_WITHDRAWN
+
+  PRODUCT_OFFER_RECEIVED
+  PRODUCT_OFFER_ACCEPTED
+  PRODUCT_OFFER_REJECTED
+  PRODUCT_OFFER_CANCELLED
+  PRODUCT_AD_SAVED
+
+  GROUP_JOIN_REQUEST
+  GROUP_JOIN_APPROVED
+  GROUP_JOIN_REJECTED
+  GROUP_MEMBER_REMOVED
+  GROUP_MEMBER_BANNED
+  GROUP_MEMBER_UNBANNED
+  GROUP_ROLE_UPDATED
+  GROUP_EVENT_CREATED
+
+  POST_REMOVED
+
+  PROPERTY_LIKED
+
+  EVENT_INTEREST_RECEIVED
+  EVENT_UPDATED
+  EVENT_CANCELLED
+
+  CHAT_MESSAGE
+}
+
+enum BannerAdPosition {
+  POPUP
+  HOME_SCREEN
+  JOBS_SCREEN
+  ROOMS_SCREEN
+  BOTTOM
+}
+
+enum BannerAdStatus {
+  RUNNING
+  PAUSED
+  EXPIRED
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum ReportTargetType {
+  USER
+  COMMUNITY_POST
+  COMMUNITY_COMMENT
+  COMMUNITY_GROUP
+  COMMUNITY_EVENT
+  MESSAGE
+  PRODUCT_AD
+  PROPERTY
+  JOB
+  BUSINESS_LISTING
+  NEED_A_WORKER
+  WORKER_PROFILE
+  BANNER_AD
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  HATE_SPEECH
+  NUDITY
+  VIOLENCE
+  SCAM
+  FALSE_INFORMATION
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  ACTIONED
+  DISMISSED
+}
+
+enum UserSupportStatus {
+  PENDING
+  RESOLVED
+}
+
+// models
+
+model User {
+  id String @id @default(uuid())
+
+  firstName   String
+  lastName    String
+  gender      Gender
+  dateOfBirth DateTime
+  email       String   @unique
+  phoneNumber String   @unique
+  password    String
+
+  status          UserStatus @default(ACTIVE)
+  termsAcceptedAt DateTime?
+  deletedAt       DateTime?
+
+  profilePhoto             ProfilePhoto?
+  address                  UserAddress?
+  properties               Property[]
+  propertyLikes            PropertyLikes[]
+  jobs                     Job[]
+  jobApplications          JobApplications[]
+  workerProfile            WorkerProfile?
+  workRequests             WorkRequest[]
+  needAWorkerRequests      NeedAWorker[]
+  needAWorkerApplications  NeedAWorkerApplication[]
+  myAds                    ProductAd[]
+  myAdOffers               ProductAdOffer[]
+  productAdSaves           ProductAdSave[]
+  businessListings         BusinessListing[]
+  conversationAsOne        Conversation[]           @relation("ConversationParticipantOne")
+  conversationAsTwo        Conversation[]           @relation("ConversationParticipantTwo")
+  sentMessages             Message[]                @relation("MessageSender")
+  fcmTokens                FcmToken[]
+  communityGroups          CommunityGroup[]         @relation("CommunityGroupCreator")
+  communityGroupMembers    CommunityGroupMember[]
+  communityPosts           CommunityPost[]          @relation("CommunityPostAuthor")
+  communityPostLikes       CommunityPostLike[]      @relation("CommunityPostLiker")
+  communityPostComments    CommunityPostComment[]   @relation("CommunityPostCommenter")
+  communityPostShares      CommunityPostShare[]     @relation("CommunityPostSharer")
+  communityPostPollVotes   CommunityPostPollVote[]  @relation("CommunityPostPollVoter")
+  communityEventsOrganized CommunityEvent[]         @relation("UserEvents")
+  communityEventsInterests CommunityEventInterest[] @relation("UserInterestedEvents")
+  notificationsReceived    Notification[]           @relation("NotificationRecipient")
+  notificationsSent        Notification[]           @relation("NotificationActor")
+  savedResourceHubArticles ResourceHubArticleSave[]
+  bannerAds                BannerAd[]
+  reportsMade              Report[]                 @relation("ReportReporter")
+  reportsReceived          Report[]                 @relation("ReportReportedUser")
+  blockedUsers             UserBlock[]              @relation("UserBlocker")
+  blockedByUsers           UserBlock[]              @relation("UserBlocked")
+  supportForms             UserSupportForm[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([phoneNumber])
+}
+
+model ProfilePhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model UserAddress {
+  id String @id @default(uuid())
+
+  streetAddress String?
+  postalCode    String?
+  city          String
+  province      String
+  country       String
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Property {
+  id                   String                      @id @default(uuid())
+  ownerId              String
+  owner                User                        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  type                 PropertyType
+  title                String
+  description          String                      @db.Text
+  status               PropertyStatus              @default(PUBLISHED)
+  monthlyRent          Decimal                     @db.Decimal(10, 2)
+  availableFrom        DateTime                    @db.Date
+  location             String
+  noOfBedRooms         Int
+  noOfBathRooms        Int
+  featuresAndAmenities PropertyFeatureAndAmenity[]
+  propertyPhotos       PropertyPhoto[]
+  contactPreference    ContactPreference
+  likes                PropertyLikes[]
+  viewsCount           Int                         @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model PropertyPhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([propertyId])
+}
+
+model PropertyLikes {
+  id         String @id @default(uuid())
+  userId     String
+  propertyId String
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, propertyId])
+  @@index([propertyId])
+  @@index([userId])
+}
+
+model Job {
+  id             String       @id @default(uuid())
+  employerId     String
+  employer       User         @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  title          String
+  companyName    String
+  categoryId     String
+  category       JobCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  salary         Decimal      @db.Decimal(10, 2)
+  salaryPeriod   SalaryPeriod
+  type           JobType
+  experience     Experience
+  languages      Language[]
+  location       String
+  workMode       WorkMode
+  description    String       @db.Text
+  requiredSkills String
+  status         JobStatus    @default(OPEN)
+  poster         JobPoster?
+
+  applications JobApplications[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([employerId])
+}
+
+model JobPoster {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  jobId String @unique
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([jobId])
+}
+
+model JobApplications {
+  id          String               @id @default(uuid())
+  jobId       String
+  job         Job                  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicantId String
+  applicant   User                 @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  status      JobApplicationStatus @default(PENDING)
+  coverLetter String?              @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([jobId, applicantId])
+  @@index([jobId])
+  @@index([applicantId])
+}
+
+model WorkerProfile {
+  id                String              @id @default(uuid())
+  workerId          String              @unique
+  worker            User                @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  profilePhoto      WorkerProfilePhoto?
+  service           WorkerService
+  experienceInYears Int
+  hourlyRate        Decimal             @db.Decimal(10, 2)
+  dailyRate         Decimal             @db.Decimal(10, 2)
+  languagesSpoken   String[]
+  isAvailableToday  Boolean
+  ownVehicle        Boolean
+  ownTools          Boolean
+  areaCovered       String
+  workPhotos        WorkPhoto[]
+  certificates      WorkCertificate[]
+  about             String
+  workApplications  WorkRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workerId])
+  @@index([service])
+}
+
+model WorkerProfilePhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  workerProfileId String        @unique
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workerProfileId])
+}
+
+model WorkCertificate {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  workerProfileId String
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workerProfileId])
+}
+
+model WorkPhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  workerProfileId String
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workerProfileId])
+}
+
+model WorkRequest {
+  id              String            @id @default(uuid())
+  requesterId     String
+  requester       User              @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  workerProfileId String
+  workerProfile   WorkerProfile     @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  service         WorkerService
+  description     String
+  location        String
+  budget          Decimal           @db.Decimal(10, 2)
+  type            WorkRequestType
+  schedule        DateTime
+  status          WorkRequestStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([requesterId])
+  @@index([workerProfileId])
+}
+
+model NeedAWorker {
+  id                 String                   @id @default(uuid())
+  requesterId        String
+  requester          User                     @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  workerTypeId       String
+  workerType         NeedAWorkerType          @relation(fields: [workerTypeId], references: [id], onDelete: Restrict)
+  location           String
+  dateNeeded         DateTime                 @db.Date
+  budget             Decimal                  @db.Decimal(10, 2)
+  budgetType         BudgetType
+  isUrgentRequest    Boolean
+  description        String
+  referencePhotos    NeedAWorkerRefPhoto[]
+  workerApplications NeedAWorkerApplication[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([requesterId])
+}
+
+model NeedAWorkerRefPhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  workRequestId String
+  workRequest   NeedAWorker @relation(fields: [workRequestId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workRequestId])
+}
+
+model NeedAWorkerApplication {
+  id            String                       @id @default(uuid())
+  workerId      String
+  worker        User                         @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  workRequestId String
+  workRequest   NeedAWorker                  @relation(fields: [workRequestId], references: [id], onDelete: Cascade)
+  coverLetter   String?                      @db.Text
+  proposedPrice Decimal?                     @db.Decimal(10, 2)
+  status        NeedAWorkerApplicationStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workerId, workRequestId])
+  @@index([workerId])
+  @@index([workRequestId])
+}
+
+model ProductAd {
+  id          String            @id @default(uuid())
+  sellerId    String
+  seller      User              @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  category    ProductAdCategory
+  title       String
+  brand       String?
+  condition   ProductCondition
+  price       Decimal           @db.Decimal(10, 2)
+  negotiable  Boolean
+  description String            @db.Text
+  photos      ProductPhoto[]
+  video       ProductVideo?
+  location    String
+  status      ProductAdStatus   @default(ACTIVE)
+  offers      ProductAdOffer[]
+  viewsCount  Int               @default(0)
+  saves       ProductAdSave[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([condition])
+}
+
+model ProductPhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  productAdId String
+  productAd   ProductAd @relation(fields: [productAdId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productAdId])
+}
+
+model ProductVideo {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  productAdId String    @unique
+  productAd   ProductAd @relation(fields: [productAdId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productAdId])
+}
+
+model ProductAdOffer {
+  id          String               @id @default(uuid())
+  productAdId String
+  productAd   ProductAd            @relation(fields: [productAdId], references: [id], onDelete: Cascade)
+  buyerId     String
+  buyer       User                 @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  offerPrice  Decimal              @db.Decimal(10, 2)
+  message     String?              @db.Text
+  status      ProductAdOfferStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productAdId, buyerId])
+  @@index([productAdId])
+  @@index([buyerId])
+}
+
+model ProductAdSave {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productAdId String
+  productAd   ProductAd @relation(fields: [productAdId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productAdId])
+  @@index([productAdId])
+  @@index([userId])
+}
+
+model BusinessListing {
+  id                String                          @id @default(uuid())
+  ownerId           String
+  owner             User                            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name              String
+  categoryId        String
+  category          BusinessCategory                @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  address           String
+  phone             String
+  whatsApp          String?
+  description       String                          @db.Text
+  businessHours     BusinessHours?
+  coverPhoto        BusinessCoverPhoto?
+  businessGalleries BusinessGallery[]
+  dailyAnalytics    BusinessListingDailyAnalytics[]
+  status            BusinessListingStatus           @default(ACTIVE)
+  viewsCount        Int                             @default(0)
+  clicks            Int                             @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model BusinessHours {
+  id                String          @id @default(uuid())
+  businessId        String          @unique
+  business          BusinessListing @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  monToFriStartTime String
+  monToFriEndTime   String
+  saturdayStartTime String
+  saturdayEndTime   String
+  sundayStartTime   String?
+  sundayEndTime     String?
+  isClosedOnSunday  Boolean
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+model BusinessCoverPhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  businessId String          @unique
+  business   BusinessListing @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+model BusinessGallery {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  businessId String
+  business   BusinessListing @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+model BusinessListingDailyAnalytics {
+  id         String          @id @default(uuid())
+  businessId String
+  business   BusinessListing @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  date       DateTime        @db.Date
+  views      Int             @default(0)
+  clicks     Int             @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([businessId, date])
+  @@index([businessId, date])
+}
+
+model Conversation {
+  id String @id @default(uuid())
+
+  participantOneId String
+  participantOne   User   @relation("ConversationParticipantOne", fields: [participantOneId], references: [id], onDelete: Cascade)
+
+  participantTwoId String
+  participantTwo   User   @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id], onDelete: Cascade)
+
+  message Message[]
+
+  lastMessageId String?  @unique
+  lastMessage   Message? @relation("LastMessage", fields: [lastMessageId], references: [id], onDelete: SetNull)
+
+  isDeletedByOne Boolean @default(false)
+  isDeletedByTwo Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([participantOneId, participantTwoId])
+  @@index([participantOneId])
+  @@index([participantTwoId])
+}
+
+model Message {
+  id String @id @default(uuid())
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  content   String        @db.Text
+  status    MessageStatus @default(SENT)
+  isDeleted Boolean       @default(false)
+  deletedAt DateTime?
+
+  lastMessageOf Conversation? @relation("LastMessage")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
+model FcmToken {
+  id     String  @id @default(uuid())
+  userId String
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token  String  @unique
+  device String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model CommunityGroup {
+  id          String                    @id @default(uuid())
+  name        String
+  description String                    @db.Text
+  status      CommunityGroupStatus      @default(ACTIVE)
+  category    CommunityGroupCategory
+  privacy     CommunityGroupPrivacy
+  creatorId   String
+  creator     User                      @relation("CommunityGroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  memberCount Int                       @default(1)
+  coverPhoto  CommunityGroupCoverPhoto?
+  members     CommunityGroupMember[]
+  posts       CommunityPost[]
+  events      CommunityEvent[]          @relation("GroupEvents")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([privacy])
+}
+
+model CommunityGroupCoverPhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  groupId String         @unique
+  group   CommunityGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([groupId])
+}
+
+model CommunityGroupMember {
+  id      String                     @id @default(uuid())
+  groupId String
+  group   CommunityGroup             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role    CommunityGroupMemberRole   @default(MEMBER)
+  status  CommunityGroupMemberStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+  @@index([userId])
+}
+
+model CommunityPost {
+  id         String                  @id @default(uuid())
+  authorId   String
+  author     User                    @relation("CommunityPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  groupId    String?
+  group      CommunityGroup?         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  type       CommunityPostType
+  visibility CommunityPostVisibility
+  content    String?                 @db.Text
+  status     CommunityPostStatus     @default(ACTIVE)
+
+  photos   CommunityPostPhoto[]
+  video    CommunityPostVideo?
+  poll     CommunityPostPoll?
+  likes    CommunityPostLike[]
+  comments CommunityPostComment[]
+  shares   CommunityPostShare[]
+
+  likesCount    Int @default(0)
+  commentsCount Int @default(0)
+  sharesCount   Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([groupId])
+  @@index([visibility])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model CommunityPostPhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  postId String
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+}
+
+model CommunityPostVideo {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  postId String        @unique
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+}
+
+model CommunityPostPoll {
+  id       String @id @default(uuid())
+  question String
+
+  postId  String                    @unique
+  post    CommunityPost             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  options CommunityPostPollOption[]
+
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+}
+
+model CommunityPostPollOption {
+  id   String @id @default(uuid())
+  text String
+
+  pollId String
+  poll   CommunityPostPoll @relation(fields: [pollId], references: [id], onDelete: Cascade)
+
+  votes     CommunityPostPollVote[]
+  voteCount Int                     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pollId])
+}
+
+model CommunityPostPollVote {
+  id String @id @default(uuid())
+
+  optionId String
+  option   CommunityPostPollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  voterId  String
+  voter    User                    @relation("CommunityPostPollVoter", fields: [voterId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([optionId, voterId])
+  @@index([optionId])
+  @@index([voterId])
+}
+
+model CommunityPostLike {
+  id String @id @default(uuid())
+
+  postId String
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User          @relation("CommunityPostLiker", fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+model CommunityPostComment {
+  id      String @id @default(uuid())
+  content String @db.Text
+
+  postId String
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User          @relation("CommunityPostCommenter", fields: [userId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   CommunityPostComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  CommunityPostComment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model CommunityPostShare {
+  id String @id @default(uuid())
+
+  postId String
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User          @relation("CommunityPostSharer", fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+  @@index([userId])
+}
+
+model CommunityEvent {
+  id               String                   @id @default(uuid())
+  name             String
+  organizerUserId  String?
+  organizerUser    User?                    @relation("UserEvents", fields: [organizerUserId], references: [id], onDelete: Cascade)
+  organizerGroupId String?
+  organizerGroup   CommunityGroup?          @relation("GroupEvents", fields: [organizerGroupId], references: [id], onDelete: Cascade)
+  startDate        DateTime
+  startTime        String
+  endDate          DateTime
+  endTime          String
+  location         String
+  isOnline         Boolean
+  description      String                   @db.Text
+  ticketPrice      Decimal                  @db.Decimal(10, 2)
+  maxAttendees     Int
+  type             CommunityEventType[]
+  visibility       CommunityEventVisibility
+  banner           CommunityEventBanner?
+  interests        CommunityEventInterest[]
+  interestsCount   Int                      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([visibility])
+  @@index([organizerUserId])
+  @@index([organizerGroupId])
+}
+
+model CommunityEventBanner {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  eventId String         @unique
+  event   CommunityEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+}
+
+model CommunityEventInterest {
+  id               String         @id @default(uuid())
+  interestedUserId String
+  interestedUser   User           @relation("UserInterestedEvents", fields: [interestedUserId], references: [id], onDelete: Cascade)
+  eventId          String
+  event            CommunityEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([interestedUserId, eventId])
+  @@index([interestedUserId])
+  @@index([eventId])
+}
+
+model BannerAd {
+  id              String           @id @default(uuid())
+  creatorId       String
+  creator         User             @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  title           String
+  description     String           @db.Text
+  ctaButtonText   String
+  destinationLink String
+  views           Int              @default(0)
+  clicks          Int              @default(0)
+  position        BannerAdPosition
+  status          BannerAdStatus   @default(RUNNING)
+  photo           BannerAdPhoto?
+  expiresAt       DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([position, status])
+}
+
+model BannerAdPhoto {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  bannerAdId String   @unique
+  bannerAd   BannerAd @relation(fields: [bannerAdId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bannerAdId])
+}
+
+model Notification {
+  id   String           @id @default(uuid())
+  type NotificationType
+
+  recipientId String
+  recipient   User   @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actorId     String
+  actor       User   @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  title String
+  body  String
+
+  postId           String?
+  commentId        String?
+  workRequestId    String?
+  jobApplicationId String?
+  productAdOfferId String?
+  groupId          String?
+  eventId          String?
+  needAWorkerAppId String?
+  propertyId       String?
+  productAdId      String?
+  workerProfileId  String?
+
+  data Json?
+
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([recipientId, isRead])
+  @@index([recipientId, createdAt])
+  @@index([actorId])
+  @@index([postId])
+  @@index([groupId])
+  @@index([eventId])
+  @@index([workRequestId])
+  @@index([propertyId])
+  @@index([productAdId])
+  @@index([workerProfileId])
+}
+
+model Report {
+  id                String           @id @default(uuid())
+  reporterId        String
+  reporter          User             @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUserId    String?
+  reportedUser      User?            @relation("ReportReportedUser", fields: [reportedUserId], references: [id], onDelete: SetNull)
+  targetType        ReportTargetType
+  targetId          String
+  reason            ReportReason
+  details           String?          @db.Text
+  status            ReportStatus     @default(PENDING)
+  reviewedByAdminId String?
+  reviewedByAdmin   Admin?           @relation(fields: [reviewedByAdminId], references: [id], onDelete: SetNull)
+  reviewedAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([reporterId, targetType, targetId])
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
+  @@index([reportedUserId])
+}
+
+model UserBlock {
+  id        String @id @default(uuid())
+  blockerId String
+  blocker   User   @relation("UserBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId String
+  blocked   User   @relation("UserBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+}
+
+model UserSupportForm {
+  id                String            @id @default(uuid())
+  userId            String?
+  user              User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name              String
+  email             String
+  message           String            @db.Text
+  status            UserSupportStatus @default(PENDING)
+  resolvedByAdminId String?
+  resolvedByAdmin   Admin?            @relation(fields: [resolvedByAdminId], references: [id], onDelete: SetNull)
+  resolvedAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// admin enums
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ResourceHubCategory {
+  IMMIGRATION
+  HOUSING
+  JOB_AND_WORK
+  HEALTHCARE
+  LEGAL_ADVICE
+  EDUCATION
+  BUSINESS
+  TAXES
+  TRANSPORT
+}
+
+// admin models
+model Admin {
+  id                           String                      @id @default(uuid())
+  firstName                    String
+  lastName                     String
+  email                        String
+  phoneNumber                  String
+  password                     String
+  jobCategories                JobCategory[]
+  businessCategory             BusinessCategory[]
+  needAWorkerTypes             NeedAWorkerType[]
+  propertyFeaturesAndAmenities PropertyFeatureAndAmenity[]
+  resourceHubArticles          ResourceHubArticle[]
+  reviewedReports              Report[]
+  resolvedSupportForms         UserSupportForm[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([phoneNumber])
+}
+
+model JobCategory {
+  id          String         @id @default(uuid())
+  title       String         @unique
+  status      CategoryStatus @default(ACTIVE)
+  createdById String?
+  createdBy   Admin?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  jobs        Job[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([title])
+}
+
+model BusinessCategory {
+  id               String            @id @default(uuid())
+  title            String            @unique
+  status           CategoryStatus    @default(ACTIVE)
+  createdById      String?
+  createdBy        Admin?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  businessListings BusinessListing[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([title])
+}
+
+model NeedAWorkerType {
+  id           String         @id @default(uuid())
+  title        String         @unique
+  status       CategoryStatus @default(ACTIVE)
+  createdById  String?
+  createdBy    Admin?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  needAWorkers NeedAWorker[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([title])
+}
+
+model PropertyFeatureAndAmenity {
+  id          String         @id @default(uuid())
+  title       String         @unique
+  status      CategoryStatus @default(ACTIVE)
+  createdById String?
+  createdBy   Admin?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  properties  Property[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([title])
+}
+
+model ExploreCountry {
+  id               String                          @id @default(uuid())
+  name             String                          @unique
+  population       BigInt                          @db.BigInt
+  language         String
+  currency         String
+  capital          String
+  banner           ExploreCountryBanner?
+  emergencyNumbers ExploreCountryEmergencyNumber[]
+  popularCities    ExploreCountryPopularCity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+}
+
+model ExploreCountryBanner {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  exploreCountryId String         @unique
+  exploreCountry   ExploreCountry @relation(fields: [exploreCountryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([exploreCountryId])
+}
+
+model ExploreCountryEmergencyNumber {
+  id               String         @id @default(uuid())
+  title            String
+  number           String
+  exploreCountryId String
+  exploreCountry   ExploreCountry @relation(fields: [exploreCountryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([title, exploreCountryId])
+  @@unique([number, exploreCountryId])
+  @@index([exploreCountryId])
+}
+
+model ExploreCountryPopularCity {
+  id               String                    @id @default(uuid())
+  name             String
+  exploreCountryId String
+  exploreCountry   ExploreCountry            @relation(fields: [exploreCountryId], references: [id], onDelete: Cascade)
+  banner           ExploreCountryCityBanner?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, exploreCountryId])
+  @@index([name])
+}
+
+model ExploreCountryCityBanner {
+  id       String @id @default(uuid())
+  url      String
+  filename String
+  mimetype String
+
+  exploreCountryPopularCityId String                    @unique
+  popularCity                 ExploreCountryPopularCity @relation(fields: [exploreCountryPopularCityId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([exploreCountryPopularCityId])
+}
+
+model ResourceHubArticle {
+  id       String                   @id @default(uuid())
+  category ResourceHubCategory
+  title    String
+  content  String                   @db.Text
+  writerId String?
+  writer   Admin?                   @relation(fields: [writerId], references: [id], onDelete: SetNull)
+  saves    ResourceHubArticleSave[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+}
+
+model ResourceHubArticleSave {
+  id        String             @id @default(uuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  articleId String
+  article   ResourceHubArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@index([articleId])
+  @@index([userId])
+}

@@ -1,0 +1,130 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: desilynks-db
+    restart: unless-stopped
+    networks:
+      - desilynks-network
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PW}
+      POSTGRES_DB: ${PG_DB}
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - desilynks-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${PG_USER} -d ${PG_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: desilynks-db-admin
+    restart: unless-stopped
+    networks:
+      - desilynks-network
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
+    ports:
+      - '127.0.0.1:5050:80'
+    depends_on:
+      - postgres
+    volumes:
+      - desilynks-db-admin:/var/lib/pgadmin
+
+  redis:
+    image: redis:7-alpine
+    container_name: desilynks-redis
+    restart: unless-stopped
+    networks:
+      - desilynks-network
+    ports:
+      - '127.0.0.1:6378:6379'
+    volumes:
+      - desilynks-redis:/data
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD}
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD}', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: desilynks-server
+    networks:
+      - desilynks-network
+    ports:
+      - '127.0.0.1:3000:3000'
+    env_file:
+      - .env
+    environment:
+      FIREBASE_SERVICE_ACCOUNT_PATH: /run/secrets/desilynks-chat-firebase.json
+    restart: unless-stopped
+    volumes:
+      - desilynks-uploads:/app/uploads
+      - ./desilynks-chat-firebase.json:/run/secrets/desilynks-chat-firebase.json:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  notification-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: desilynks-notification-worker
+    networks:
+      - desilynks-network
+    env_file:
+      - .env
+    environment:
+      FIREBASE_SERVICE_ACCOUNT_PATH: /run/secrets/desilynks-chat-firebase.json
+    restart: unless-stopped
+    volumes:
+      - ./desilynks-chat-firebase.json:/run/secrets/desilynks-chat-firebase.json:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  admin-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    container_name: desilynks-admin-api
+    networks:
+      - desilynks-network
+    ports:
+      - '127.0.0.1:3001:3000'
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - desilynks-uploads:/app/uploads
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+networks:
+  desilynks-network:
+    external: true
+    name: desilynks-shared-network
+
+volumes:
+  desilynks-db-data:
+  desilynks-db-admin:
+  desilynks-redis:
+  desilynks-uploads:

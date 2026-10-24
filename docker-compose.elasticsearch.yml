@@ -1,0 +1,177 @@
+services:
+  sysctl-setup:
+    image: busybox
+    privileged: true
+    command: sysctl -w vm.max_map_count=262144
+    networks:
+      - desilynks-network
+
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.6
+    user: '0'
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+    networks:
+      - desilynks-network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          '[ -f /usr/share/elasticsearch/config/certs/elastic-certificates.p12 ]',
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+    command: >
+      bash -c '
+        if [ ! -f config/certs/elastic-certificates.p12 ]; then
+          echo "Generating CA...";
+          bin/elasticsearch-certutil ca --silent --pass "" -out config/certs/elastic-stack-ca.p12;
+          echo "Generating node certificates...";
+          bin/elasticsearch-certutil cert --silent --pass "" --ca config/certs/elastic-stack-ca.p12 --ca-pass "" -out config/certs/elastic-certificates.p12;
+          echo "Setting certificate permissions...";
+          chown -R 1000:0 config/certs;
+        fi;
+        echo "Certificates ready. Waiting for Elasticsearch to start...";
+        until curl -sf -u "elastic:${ELASTIC_PASSWORD}" http://es01:9200/_cluster/health; do
+          echo "Waiting for es01...";
+          sleep 10;
+        done;
+        echo "Setting kibana_system user password...";
+        until curl -sf -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}"; do
+          echo "Retrying kibana_system password setup...";
+          sleep 5;
+        done;
+        echo "Setting application role and user...";
+        until curl -sf -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://es01:9200/_security/role/desilynks_app -d "{\"cluster\":[\"monitor\"],\"indices\":[{\"names\":[\"properties\",\"jobs\",\"worker_profiles\",\"product_ads\",\"need_a_worker\",\"business_listings\"],\"privileges\":[\"all\"]}]}"; do
+          echo "Retrying application role setup...";
+          sleep 5;
+        done;
+        until curl -sf -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://es01:9200/_security/user/${ELASTICSEARCH_USERNAME:?ELASTICSEARCH_USERNAME is required} -d "{\"password\":\"${ELASTICSEARCH_PASSWORD:?ELASTICSEARCH_PASSWORD is required}\",\"roles\":[\"desilynks_app\"]}"; do
+          echo "Retrying application user setup...";
+          sleep 5;
+        done;
+        echo "Setup complete!";
+      '
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.6
+    container_name: es01
+    restart: unless-stopped
+    depends_on:
+      sysctl-setup:
+        condition: service_completed_successfully
+      setup:
+        condition: service_healthy
+    environment:
+      node.name: es01
+      cluster.name: desilynks-search
+      discovery.seed_hosts: es02
+      cluster.initial_master_nodes: es01, es02
+      bootstrap.memory_lock: true
+      xpack.security.enabled: ${ELASTIC_SECURITY_ENABLED}
+      xpack.security.transport.ssl.enabled: true
+      xpack.security.transport.ssl.verification_mode: certificate
+      xpack.security.transport.ssl.keystore.path: certs/elastic-certificates.p12
+      xpack.security.transport.ssl.truststore.path: certs/elastic-certificates.p12
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_JAVA_OPTS: ${ES_JAVA_OPTS}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - es01_data:/usr/share/elasticsearch/data
+      - certs:/usr/share/elasticsearch/config/certs
+    ports:
+      - '127.0.0.1:9200:9200'
+    networks:
+      - desilynks-network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -sf -u "elastic:${ELASTIC_PASSWORD}" http://localhost:9200/_cluster/health || exit 1',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.6
+    container_name: es02
+    restart: unless-stopped
+    depends_on:
+      sysctl-setup:
+        condition: service_completed_successfully
+      setup:
+        condition: service_healthy
+    environment:
+      node.name: es02
+      cluster.name: desilynks-search
+      discovery.seed_hosts: es01
+      cluster.initial_master_nodes: es01, es02
+      bootstrap.memory_lock: true
+      xpack.security.enabled: ${ELASTIC_SECURITY_ENABLED}
+      xpack.security.transport.ssl.enabled: true
+      xpack.security.transport.ssl.verification_mode: certificate
+      xpack.security.transport.ssl.keystore.path: certs/elastic-certificates.p12
+      xpack.security.transport.ssl.truststore.path: certs/elastic-certificates.p12
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_JAVA_OPTS: ${ES_JAVA_OPTS}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - es02_data:/usr/share/elasticsearch/data
+      - certs:/usr/share/elasticsearch/config/certs
+    ports:
+      - '127.0.0.1:9201:9200'
+    networks:
+      - desilynks-network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -sf -u "elastic:${ELASTIC_PASSWORD}" http://localhost:9200/_cluster/health || exit 1',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.6
+    container_name: kibana
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://es01:9200","http://es02:9200"]'
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD}
+    ports:
+      - '127.0.0.1:5601:5601'
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+      es01:
+        condition: service_healthy
+    networks:
+      - desilynks-network
+
+volumes:
+  es01_data:
+  es02_data:
+  certs:
+
+networks:
+  desilynks-network:
+    external: true
+    name: desilynks-shared-network
